@@ -40,13 +40,13 @@ unconfigured_ports = defaultdict(list)
 
 
 def meraki_config(api, sw_list, interface_dict, downlink_list):
-    def config_access_port(serial, p_number, desc, active, mode,
-                                  data_vlan, voice_vlan):
+    def config_access_port(serial, p_number, desc=None, mode="access",
+                           data_vlan=None, voice_vlan=None):
         try:
             dashboard = meraki.DashboardAPI(api, suppress_logging=True)
             update_status = dashboard.switch.updateDeviceSwitchPort(serial, p_number,
                                                                 name=desc,
-                                                                enabled=active,
+                                                                enabled=True,
                                                                 type=mode,
                                                                 vlan=data_vlan,
                                                                 voiceVlan=voice_vlan)
@@ -57,13 +57,13 @@ def meraki_config(api, sw_list, interface_dict, downlink_list):
             print(e)
             unconfigured_ports[serial].append(p_number)
 
-    def config_access_port_trunk(serial, p_number, desc, active, mode,
-                                 native_vlan, allowed_vlan):
+    def config_access_port_trunk(serial, p_number, desc=None, mode="trunk",
+                                 native_vlan=None, allowed_vlan=[]):
         try:
             dashboard = meraki.DashboardAPI(api, suppress_logging=True)
             update_status = dashboard.switch.updateDeviceSwitchPort(serial, p_number,
                                                                     name=desc,
-                                                                    enabled=active,
+                                                                    enabled=True,
                                                                     type=mode,
                                                                     vlan=native_vlan,
                                                                     allowedVlans=allowed_vlan,
@@ -126,7 +126,6 @@ def meraki_config(api, sw_list, interface_dict, downlink_list):
                     config_access_port(sw_list[sw],
                                        interface_dict[x]['port'],
                                        interface_dict[x]["desc"],
-                                       interface_dict[x]["active"],
                                        interface_dict[x]['mode'],
                                        interface_dict[x]['data_vlan'],
                                        interface_dict[x]['voice_vlan'])
@@ -154,7 +153,6 @@ def meraki_config(api, sw_list, interface_dict, downlink_list):
                     config_access_port_trunk(sw_list[sw],
                                              interface_dict[x]['port'],
                                              interface_dict[x]['desc'],
-                                             interface_dict[x]['active'],
                                              interface_dict[x]['mode'],
                                              interface_dict[x]['native'],
                                              interface_dict[x]['trunk_allowed'])
@@ -263,12 +261,12 @@ def start(API, sw_list, cisco_sw_config):
 
                 interface_dict[intf_name] = {}
                 interface_dict[intf_name]['sw_module'] = "1"
-                interface_dict[intf_name]['desc'] = ""
+                interface_dict[intf_name]['desc'] = None
                 interface_dict[intf_name]['port'] = ""
-                interface_dict[intf_name]['mode'] = ""
+                interface_dict[intf_name]['mode'] = None
                 interface_dict[intf_name]['active'] = "true"
-                interface_dict[intf_name]['data_vlan'] = ""
-                interface_dict[intf_name]['voice_vlan'] = ""
+                interface_dict[intf_name]['data_vlan'] = None
+                interface_dict[intf_name]['voice_vlan'] = None
 
                 try:
                     port, sub_module = check(intf_name)
