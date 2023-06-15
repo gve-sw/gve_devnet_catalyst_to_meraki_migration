@@ -157,7 +157,7 @@ def meraki_config(api, sw_list, interface_dict, downlink_list):
                                              interface_dict[x]['native'],
                                              interface_dict[x]['trunk_allowed'])
                 # If the interface is not configured as access or trunk just pass
-                elif interface_dict[x]['mode'] == "":
+                elif interface_dict[x]['mode'] is None:
                     if interface_dict[x]["active"] == "false":
                         if interface_dict[x]['desc'] != "":
                             description = interface_dict[x]['desc']
@@ -310,7 +310,7 @@ def start(API, sw_list, cisco_sw_config):
                         if trunk_native != "":
                             interface_dict[intf_name]['native'] = trunk_native
                         if trunk_v_allowed != "":
-                            interface_dict[intf_name]['trunk_allowed'] = trunk_v_allowed
+                            interface_dict[intf_name]['trunk_allowed'] = trunk_v_allowed.replace("add ", "")
 
                 except:
                     print(f"Error in ready interface {intf_name}")
